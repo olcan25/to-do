@@ -1,134 +1,69 @@
 <template>
-  <div
-    class="
-      h-100
-      w-full
-      flex
-      items-center
-      justify-center
-      bg-teal-lightest
-      font-sans
-    "
-  >
-    <div class="bg-white rounded shadow p-6 m-4 w-full lg:w-3/4 lg:max-w-lg">
-      <div class="mb-4">
-        <h1 class="text-grey-darkest">Todo List</h1>
-        <div class="flex mt-4">
-          <input
-            class="
-              shadow
-              appearance-none
-              border
-              rounded
-              w-full
-              py-2
-              px-3
-              mr-4
-              text-grey-darker
-            "
-            v-model="state.todoValue"
-            placeholder="Add Todo"
-          />
-          <button
-            @click="addTodo()"
-            class="
-              flex-no-shrink
-              p-2
-              border-2
-              rounded
-              text-teal
-              border-teal
-              hover:text-cyan-500 hover:bg-teal
-            "
-          >
-            Add
-          </button>
+  <form @submit="handleSubmit">
+    <div class="w-full h-screen bg-gray-100 pt-8">
+      <div class="bg-white p-3 max-w-md mx-auto">
+        <div class="text-center">
+          <h1 class="text-3xl font-bold">ToDo App</h1>
+          <div class="mt-4 flex mb-4">
+            <TodoInput v-model="title" :error="errorTitle" />
+            <TodoAddButton />
+          </div>
+          <TodoErrorMessage :error="errorTitle" />
         </div>
-      </div>
-      <div v-for="(todo, index) in todos" :key="todo.id">
-        <div class="flex mb-4 items-center">
-          <p
-            :class="
-              todo.isDone
-                ? 'w-full line-through text-green'
-                : 'w-full text-grey-darkest'
-            "
-          >
-            {{ index + 1 }}
-          </p>
-          <p
-            :class="
-              todo.isDone
-                ? 'w-full line-through text-green'
-                : 'w-full text-grey-darkest'
-            "
-          >
-            {{ todo.title }}
-          </p>
-          <button
-            @click="isDoneFunc(todo, index)"
-            class="
-              flex-no-shrink
-              p-2
-              ml-4
-              mr-2
-              border-2
-              rounded
-              hover:text-yellow-500
-              text-green
-              border-green
-              hover:bg-green
-            "
-          >
-            Done
-          </button>
-          <button
-            @click="removeTodo(todo.id)"
-            class="
-              flex-no-shrink
-              p-2
-              ml-2
-              border-2
-              rounded
-              text-red
-              border-red
-              hover:text-red-500 hover:bg-red
-            "
-          >
-            Remove
-          </button>
+        <div class="mt-8">
+          <ul>
+            <TodoList v-for="todo in todos" :key="todo.id" :todo="todo" />
+          </ul>
         </div>
+        <TodoFooter :todos="todos" />
       </div>
     </div>
-  </div>
+  </form>
 </template>
 
 
-<script setup>
-import { storeToRefs } from "pinia";
-import { reactive } from "vue";
-import useTodoStore from "../store/todo";
 
-const state = reactive({
-  todoValue: "",
+
+<script setup>
+//npm packages
+import { storeToRefs } from "pinia";
+import useTodoStore from "../store/todo";
+import { useForm } from "@vorms/core";
+import { yupResolver } from "@vorms/resolvers/yup";
+import * as yup from "yup";
+
+//custom components
+import TodoInput from "../components/TodoInput.vue";
+import TodoAddButton from "../components/TodoAddButton.vue";
+import TodoList from "../components/TodoList.vue";
+import TodoFooter from "../components/TodoFooter.vue";
+import TodoErrorMessage from "../components/TodoErrorMessage.vue";
+
+const schema = yup.object({
+  title: yup
+    .string()
+    .required("Bos olamaz.")
+    .min(5, "En az 5 karakter olmalıdır.")
+    .max(25, "En fazla 25 karakterli olmalıdır."),
 });
 
+const { register, handleReset, handleSubmit, errors, setValues } = useForm({
+  initialValues: {
+    title: "",
+    description: "",
+    isDone: false,
+  },
+  validate: yupResolver(schema),
+  onSubmit(value) {
+    addTodo(value);
+  },
+});
+
+const { value: title, error: errorTitle } = register("title");
+
+
 const { todos } = storeToRefs(useTodoStore());
-const todoStore = useTodoStore();
+const { addTodo, loadTodos } = useTodoStore();
 
-todoStore.loadTodos();
-
-const addTodo = () => {
-  todoStore.addTodo({ title: state.todoValue, description: "", isDone: false });
-  state.todoValue = "";
-};
-
-const removeTodo = (id) => {
-  todoStore.removeTodo(id);
-};
-
-const isDoneFunc = (value, index) => {
-  value.isDone = !value.isDone;
-  todoStore.isDoneEdit(value);
-};
+loadTodos();
 </script>
