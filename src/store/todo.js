@@ -45,9 +45,9 @@ const useTodo = defineStore('todo', {
             }
         },
         removeAll(todos) {
+            toast.success('Tumu Silindi')
             todos.forEach(x => {
                 deleteDoc(doc(db, 'todos', x.id)).then(x => {
-                    toast.success('Tumu Silindi')
                     this.todos = null
                 }).catch(err => {
                     toast.error(err)
