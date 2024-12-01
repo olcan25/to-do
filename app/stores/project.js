@@ -1,8 +1,10 @@
 import { defineStore } from "pinia";
 
 // const nuxtApp = useNuxtApp();
+import { useToast } from "vue-toastification";
 
 export const useProjectStore = defineStore("project", () => {
+  const $toast = useToast();
   // const { $toast } = nuxtApp;
 
   const authStore = useAuthStore();
@@ -47,7 +49,7 @@ export const useProjectStore = defineStore("project", () => {
         method: "POST",
         body: data,
       });
-      // $toast.success("Proje olusturuldu");
+      $toast.success("Proje olusturuldu");
 
       projects.value.push(result.data);
       navigateTo("/projects");
@@ -78,7 +80,7 @@ export const useProjectStore = defineStore("project", () => {
         (note) => !removedTaskIds.includes(note.task_id)
       );
 
-      // $toast.success("Proje silindi");
+      $toast.success("Proje silindi");
     } catch (err) {
       error.value = err;
     }
@@ -99,7 +101,7 @@ export const useProjectStore = defineStore("project", () => {
         return p;
       });
 
-      // $toast.success("Proje düzenlendi");
+      $toast.success("Proje düzenlendi");
     } catch (err) {
       error.value = err;
     }

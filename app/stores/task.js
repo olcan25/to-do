@@ -1,6 +1,8 @@
 import { defineStore } from "pinia";
+import { useToast } from "vue-toastification";
 
 export const useTaskStore = defineStore("task", () => {
+  const $toast = useToast();
   const authStore = useAuthStore();
   const taskNotesStore = useTaskNoteStore();
   const tasks = ref([]);
@@ -43,6 +45,7 @@ export const useTaskStore = defineStore("task", () => {
         body: data,
       });
 
+      $toast.success("Görev olusturuldu");
       message.value = result.message;
 
       tasks.value.push(result.data);
@@ -56,6 +59,7 @@ export const useTaskStore = defineStore("task", () => {
       const result = await $fetch(`/api/tasks/${id}`, {
         method: "DELETE",
       });
+      $toast.success("Görev silindi");
       tasks.value = tasks.value.filter((t) => t.id !== id);
       taskNotesStore.taskNotes = taskNotesStore.taskNotes.filter(
         (note) => note.task_id !== id
@@ -73,6 +77,8 @@ export const useTaskStore = defineStore("task", () => {
         method: "PUT",
         body: data,
       });
+
+      $toast.success("Görev düzenlendi");
       message.value = result.message;
 
       tasks.value = tasks.value.map((t) => {

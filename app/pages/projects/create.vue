@@ -3,6 +3,7 @@
 </template>
 
 <script setup>
+import { useToast } from 'vue-toastification'
 definePageMeta({
   middleware: "auth",
 });
@@ -23,7 +24,7 @@ setFieldValue("status", "planned");
 
 const onSubmit = handleSubmit(async (values) => {
   await projectStore.createProject(values);
-
   navigateTo("/projects");
+
 });
 </script>

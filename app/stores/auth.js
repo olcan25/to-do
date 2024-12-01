@@ -1,6 +1,8 @@
 import { defineStore } from "pinia";
+import { useToast } from "vue-toastification";
 
 export const useAuthStore = defineStore("auth", () => {
+  const $toast = useToast();
   const user = ref(null);
 
   const signUp = async (data) => {
@@ -10,6 +12,7 @@ export const useAuthStore = defineStore("auth", () => {
         method: "POST",
         body: data,
       });
+      $toast.success("Kullanıcı olusturuldu");
       return result;
     } catch (error) {
       return { error };
@@ -23,6 +26,7 @@ export const useAuthStore = defineStore("auth", () => {
         method: "POST",
         body: data,
       });
+      $toast.success("Giris yapildi");
       return result;
     } catch (error) {
       return { error };
@@ -61,13 +65,13 @@ export const useAuthStore = defineStore("auth", () => {
         headers: useRequestHeaders(["cookie"]),
         method: "GET",
       });
-  
+
       if (error.value) {
         console.error("Kullanıcı kontrol hatası:", error.value);
         user.value = null; // Kullanıcı oturumu yoksa null atayın
         return;
       }
-  
+
       if (data.value) {
         user.value = data.value;
       } else {
@@ -78,7 +82,6 @@ export const useAuthStore = defineStore("auth", () => {
       user.value = null; // Genel hata durumunda da null
     }
   };
-  
 
   return { user, signUp, signIn, signOut, checkUser };
 });
