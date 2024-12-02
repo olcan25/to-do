@@ -42,6 +42,21 @@ export const useProjectStore = defineStore("project", () => {
     }
   };
 
+  const fetchProjectByIdIncludeTasks = async (id) => {
+
+    try {
+
+      const { data } = await $fetch(`/api/projects/${id}/include`, {
+        headers: useRequestHeaders(["cookie"]),
+        method: "GET",
+      });
+      project.value = data;
+      console.log("store ", data);
+    } catch (err) {
+      error.value = err;
+    }
+  };
+
   const createProject = async (data) => {
     try {
       data.owner_id = authStore.user.id;
@@ -115,6 +130,7 @@ export const useProjectStore = defineStore("project", () => {
     isLoading,
     fetchProjects,
     fetchProject,
+    fetchProjectByIdIncludeTasks,
     createProject,
     deleteProject,
     updateProject,

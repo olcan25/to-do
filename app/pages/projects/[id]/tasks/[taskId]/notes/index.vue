@@ -4,19 +4,17 @@
       <div class="container mx-auto px-4 flex items-center justify-between">
         <!-- Başlık -->
         <h1 class="text-2xl font-bold text-black">Görev Notları</h1>
-
         <h1 class="text-2xl font-bold text-black">
           Proje : {{ project?.name }}, Görev : {{ task?.title }}
         </h1>
 
         <!-- Ekle Butonu -->
-
         <div class="flex items-center space-x-4">
           <nuxt-link
             :to="`/projects/${id}/tasks`"
             class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
           >
-            Geri Don
+            Geri Dön
           </nuxt-link>
           <button
             @click="showModal = true"
@@ -27,10 +25,8 @@
         </div>
 
         <Modal v-if="showModal" :visible="showModal" @close="showModal = false">
-          <template #title> Gorev Ekle </template>
-
-          <field-text-area field-name="content" field-label="Içerik" />
-
+          <template #title> Görev Notu Ekle </template>
+          <field-text-area field-name="content" field-label="İçerik" />
           <template #footer>
             <button
               type="button"
@@ -52,15 +48,14 @@
     </header>
 
     <main class="flex-grow container mx-auto px-4 py-6 overflow-auto">
-      <div class="bg-white shadow-md rounded-lg overflow-hidden">
+      <!-- Büyük cihazlar için tablo -->
+      <div class="bg-white shadow-md rounded-lg overflow-hidden hidden lg:block">
         <table class="w-full border-collapse table-auto">
           <thead class="bg-blue-600 text-white sticky top-0">
             <tr>
               <th class="px-4 py-2 text-left text-sm font-semibold">#</th>
               <th class="px-4 py-2 text-left text-sm font-semibold">İçerik</th>
-              <th class="px-4 py-2 text-left text-sm font-semibold">
-                Eylemler
-              </th>
+              <th class="px-4 py-2 text-left text-sm font-semibold">Eylemler</th>
             </tr>
           </thead>
           <tbody>
@@ -76,39 +71,12 @@
                 {{ note.content }}
               </td>
               <td class="px-4 py-2 border-b text-center">
-                <!-- Not Ekle/Düzenle Formu -->
                 <button
                   @click="onShowModalUpdate(note)"
-               class="px-3 py-1 text-sm bg-yellow-500 text-white rounded-md hover:bg-yellow-600"
+                  class="px-3 py-1 text-sm bg-yellow-500 text-white rounded-md hover:bg-yellow-600"
                 >
-                  Duzenle
+                  Düzenle
                 </button>
-
-                <Modal
-                  v-if="showModalUpdate"
-                  :visible="showModalUpdate"
-                  @close="showModalUpdate = false"
-                >
-                  <template #title> Görev Duzenle </template>
-
-                  <field-text-area field-name="content" field-label="Içerik" />
-
-                  <template #footer>
-                    <button
-                      @click="onSubmitUpdate({ id: note.id })"
-                      class="px-3 py-1 text-sm bg-yellow-500 text-white rounded-md hover:bg-yellow-600"
-                    >
-                      Duzenle
-                    </button>
-                    <button
-                      @click="showModalUpdate = false"
-                      class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300"
-                    >
-                      Kapat
-                    </button>
-                  </template>
-                </Modal>
-
                 <button
                   @click="taskNoteStore.deleteTaskNote(note.id)"
                   class="px-3 py-1 text-sm bg-red-500 text-white rounded-md hover:bg-red-600 ml-2"
@@ -119,6 +87,28 @@
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <!-- Mobil ve tablet cihazlar için liste -->
+      <div v-for="(note, index) in taskNotes" :key="note.id" class="block lg:hidden bg-white shadow-md rounded-lg p-4 mb-4">
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="text-lg font-semibold">Not #{{ index + 1 }}</h3>
+          <div class="flex space-x-2">
+            <button
+              @click="onShowModalUpdate(note)"
+              class="px-3 py-1 text-sm bg-yellow-500 text-white rounded-md hover:bg-yellow-600"
+            >
+              Düzenle
+            </button>
+            <button
+              @click="taskNoteStore.deleteTaskNote(note.id)"
+              class="px-3 py-1 text-sm bg-red-500 text-white rounded-md hover:bg-red-600"
+            >
+              Sil
+            </button>
+          </div>
+        </div>
+        <p class="text-sm text-gray-700">{{ note.content }}</p>
       </div>
     </main>
   </div>
